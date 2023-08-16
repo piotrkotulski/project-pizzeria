@@ -227,10 +227,6 @@
             thisWidget.getElements(element);
             thisWidget.setValue(settings.amountWidget.defaultValue);
             thisWidget.initActions();
-
-
-            console.log('Amount widget:', thisWidget);
-            console.log('constructor agumenys', element);
         }
 
         getElements(element) {
@@ -252,10 +248,10 @@
             if (!isNaN(newValue) && newValue >= minValue && newValue <= maxValue && thisWidget.value !== newValue) {
 
                 thisWidget.value = newValue;
-                thisWidget.input.value = thisWidget.value;
-                this.announce();
-
             }
+
+            thisWidget.input.value = thisWidget.value;
+            this.announce();
         }
 
         initActions() {
