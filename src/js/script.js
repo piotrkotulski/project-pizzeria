@@ -233,12 +233,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const params = thisProduct.prepareCartProductParams();
 
             const productSummary = {
-                'id': thisProduct.id,
-                'name': thisProduct.data.name,
-                'amount': thisProduct.amountWidget.value,
-                'priceSingle': thisProduct.priceSingle,
-                'price': thisProduct.priceSingle * thisProduct.amountWidget.value,
-                'params': params
+                id: thisProduct.id,
+                name: thisProduct.data.name,
+                amount: thisProduct.amountWidget.value,
+                priceSingle: thisProduct.priceSingle,
+                price: thisProduct.priceSingle * thisProduct.amountWidget.value,
+                params: params
             };
 
             return productSummary;
