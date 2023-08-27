@@ -405,6 +405,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Execute getElements method
             thisCartProduct.getElements(element);
+            thisCartProduct.initAmountWidget();
         }
 
         getElements(element) {
@@ -416,6 +417,25 @@ document.addEventListener('DOMContentLoaded', function () {
             thisCartProduct.dom.price = element.querySelector(select.cartProduct.price);
             thisCartProduct.dom.edit = element.querySelector(select.cartProduct.edit);
             thisCartProduct.dom.remove = element.querySelector(select.cartProduct.remove);
+        }
+
+        initAmountWidget() {
+            const thisCartProduct = this;
+
+            thisCartProduct.amountWidget = new AmountWidget(thisCartProduct.dom.amountWidget); // Tworzenie instancji widgetu
+            thisCartProduct.dom.amountWidget.addEventListener('updated', function () {
+                thisCartProduct.processOrder(); // Przelicz cenę produktu po zmianie ilości
+            });
+        }
+
+        processOrder() {
+            const thisCartProduct = this;
+
+            thisCartProduct.amount = thisCartProduct.amountWidget.value; // Aktualizacja ilości sztuk
+            thisCartProduct.price = thisCartProduct.priceSingle * thisCartProduct.amount; // Przelicz całkowitą cenę
+
+            // Aktualizacja wyświetlanej ceny na stronie
+            thisCartProduct.dom.price.innerHTML = thisCartProduct.price;
         }
     }
 
