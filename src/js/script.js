@@ -95,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function () {
             thisProduct.initOrderForm();
             thisProduct.initAmountWidget();
             thisProduct.processOrder();
-            console.log('new Product:', thisProduct);
         }
 
         renderInMenu() {
@@ -180,13 +179,10 @@ document.addEventListener('DOMContentLoaded', function () {
         processOrder() {
             const thisProduct = this;
             const formData = utils.serializeFormToObject(thisProduct.form);
-            console.log('formData', formData);
-
             let price = thisProduct.data.price;
 
             for (let paramId in thisProduct.data.params) {
                 const param = thisProduct.data.params[paramId];
-                console.log(paramId, param);
 
                 for (let optionId in param.options) {
                     if (param.options.hasOwnProperty(optionId)) {
@@ -367,26 +363,21 @@ document.addEventListener('DOMContentLoaded', function () {
         add(menuProduct) {
             const thisCart = this;
 
-            // Replace menuProduct with CartProduct instance
+            thisCart.renderCartProduct(menuProduct);
+
             const cartProductInstance = new CartProduct(menuProduct, thisCart.dom.productList);
 
-            // Push the CartProduct instance to the products array
             thisCart.products.push(cartProductInstance);
-            console.log('TEST', thisCart.products);
-            thisCart.renderCartProduct(menuProduct);
         }
 
 
         renderCartProduct(productData) {
             const thisCart = this;
 
-            // Compile the Handlebars template
             const generatedHTML = templates.cartProduct(productData);
 
-            // Create a new DOM element from the generated HTML
             const generatedDOM = utils.createDOMFromHTML(generatedHTML);
 
-            // Append the DOM element to the productList in the cart
             thisCart.dom.productList.appendChild(generatedDOM); // Dodane
 
         }
@@ -397,13 +388,11 @@ document.addEventListener('DOMContentLoaded', function () {
         constructor(menuProduct, element) {
             const thisCartProduct = this;
 
-            // Assign properties from menuProduct
             thisCartProduct.id = menuProduct.id;
             thisCartProduct.name = menuProduct.name;
             thisCartProduct.priceSingle = menuProduct.price;
             thisCartProduct.params = JSON.parse(JSON.stringify(menuProduct.params));
 
-            // Execute getElements method
             thisCartProduct.getElements(element);
             thisCartProduct.initAmountWidget();
         }
@@ -422,19 +411,18 @@ document.addEventListener('DOMContentLoaded', function () {
         initAmountWidget() {
             const thisCartProduct = this;
 
-            thisCartProduct.amountWidget = new AmountWidget(thisCartProduct.dom.amountWidget); // Tworzenie instancji widgetu
+            thisCartProduct.amountWidget = new AmountWidget(thisCartProduct.dom.amountWidget);
             thisCartProduct.dom.amountWidget.addEventListener('updated', function () {
-                thisCartProduct.processOrder(); // Przelicz cenę produktu po zmianie ilości
+                thisCartProduct.processOrder();
             });
         }
 
         processOrder() {
             const thisCartProduct = this;
 
-            thisCartProduct.amount = thisCartProduct.amountWidget.value; // Aktualizacja ilości sztuk
-            thisCartProduct.price = thisCartProduct.priceSingle * thisCartProduct.amount; // Przelicz całkowitą cenę
+            thisCartProduct.amount = thisCartProduct.amountWidget.value;
+            thisCartProduct.price = thisCartProduct.priceSingle * thisCartProduct.amount;
 
-            // Aktualizacja wyświetlanej ceny na stronie
             thisCartProduct.dom.price.innerHTML = thisCartProduct.price;
         }
     }
@@ -442,8 +430,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const app = {
         initMenu: function () {
             const thisApp = this;
-
-            console.log('thisApp.data:', thisApp.data);
 
             for (let productData in thisApp.data.products) {
                 new Product(productData, thisApp.data.products[productData]);
@@ -464,11 +450,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         init: function () {
             const thisApp = this;
-            console.log('*** App starting ***');
-            console.log('thisApp:', thisApp);
-            console.log('classNames:', classNames);
-            console.log('settings:', settings);
-            console.log('templates:', templates);
 
             thisApp.initData();
             thisApp.initMenu();
