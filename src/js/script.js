@@ -272,8 +272,8 @@ document.addEventListener('DOMContentLoaded', function () {
         constructor(element) {
             const thisWidget = this;
             thisWidget.getElements(element);
-            thisWidget.setValue(settings.amountWidget.defaultValue);
             thisWidget.initActions();
+            thisWidget.setValue(thisWidget.input.value || settings.amountWidget.defaultValue);
         }
 
         getElements(element) {
@@ -324,7 +324,10 @@ document.addEventListener('DOMContentLoaded', function () {
         announce() {
             const thisWidget = this;
 
-            const event = new Event('updated');
+            const event = new CustomEvent('updated', {
+                bubbles: true
+            });
+
             thisWidget.element.dispatchEvent(event);
         }
     }
@@ -345,12 +348,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const thisCart = this;
 
             thisCart.dom = {};
-
             thisCart.dom.wrapper = element;
-
-            thisCart.dom.productList = element.querySelector(select.cart.productList); // Dodane pole productList
+            thisCart.dom.productList = element.querySelector(select.cart.productList);
             thisCart.dom.toggleTrigger = thisCart.dom.wrapper.querySelector(select.cart.toggleTrigger);
+            thisCart.dom.deliveryFee = thisCart.dom.wrapper.querySelector(select.cart.deliveryFee);
+            thisCart.dom.subtotalPrice = thisCart.dom.wrapper.querySelector(select.cart.subtotalPrice);
+            thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelectorAll(select.cart.totalPrice);
+            thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(select.cart.totalNumber);
         }
+
 
         initActions() {
             const thisCart = this;
@@ -358,7 +364,43 @@ document.addEventListener('DOMContentLoaded', function () {
             thisCart.dom.toggleTrigger.addEventListener('click', function () {
                 thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive); // Toggle klasy
             });
+
+            thisCart.dom.productList.addEventListener('updated', function () {
+                thisCart.update();
+            });
         }
+
+        update() {
+            const thisCart = this;
+            const deliveryFee = settings.cart.defaultDeliveryFee;
+
+
+            let totalNumber = 0;
+            let subtotalPrice = 0;
+
+
+            for (let cartProduct of thisCart.products) {
+                totalNumber += cartProduct.amountWidget.value;
+                subtotalPrice += cartProduct.priceSingle * cartProduct.amountWidget.value;
+            }
+
+            if (totalNumber === 0) {
+                thisCart.totalPrice = 0;
+            } else {
+                thisCart.totalPrice = subtotalPrice + deliveryFee;
+                console.log(thisCart.totalPrice);
+            }
+
+            thisCart.dom.totalNumber.textContent = totalNumber;
+            thisCart.dom.subtotalPrice.textContent = subtotalPrice;
+            thisCart.dom.deliveryFee.textContent = deliveryFee;
+            //thisCart.dom.totalPrice.textContent = thisCart.totalPrice;
+
+            for (let totalPrice of thisCart.dom.totalPrice) {
+                totalPrice.textContent = thisCart.totalPrice;
+            }
+        }
+
 
         add(menuProduct) {
             const thisCart = this;
@@ -368,6 +410,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const cartProductInstance = new CartProduct(menuProduct, thisCart.dom.productList);
 
             thisCart.products.push(cartProductInstance);
+            cartProductInstance.initAmountWidget();
+            thisCart.update();
         }
 
 
@@ -390,11 +434,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
             thisCartProduct.id = menuProduct.id;
             thisCartProduct.name = menuProduct.name;
-            thisCartProduct.priceSingle = menuProduct.price;
+            thisCartProduct.priceSingle = menuProduct.priceSingle;
             thisCartProduct.params = JSON.parse(JSON.stringify(menuProduct.params));
 
             thisCartProduct.getElements(element);
             thisCartProduct.initAmountWidget();
+            thisCartProduct.processOrder();
         }
 
         getElements(element) {
