@@ -75,6 +75,11 @@ document.addEventListener('DOMContentLoaded', function () {
         cart: {
             defaultDeliveryFee: 20,
         },
+        db: {
+            url: '//localhost:3131',
+            products: 'products',
+            orders: 'orders',
+        },
     };
 
     const templates = {
@@ -355,6 +360,9 @@ document.addEventListener('DOMContentLoaded', function () {
             thisCart.dom.subtotalPrice = thisCart.dom.wrapper.querySelector(select.cart.subtotalPrice);
             thisCart.dom.totalPrice = thisCart.dom.wrapper.querySelectorAll(select.cart.totalPrice);
             thisCart.dom.totalNumber = thisCart.dom.wrapper.querySelector(select.cart.totalNumber);
+            thisCart.dom.form = thisCart.dom.wrapper.querySelector(select.cart.form);
+            thisCart.dom.phone = thisCart.dom.wrapper.querySelector(select.cart.phone);
+            thisCart.dom.address = thisCart.dom.wrapper.querySelector(select.cart.address);
         }
 
 
@@ -373,11 +381,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const cartProduct = event.detail.cartProduct;
                 thisCart.remove(cartProduct);
             });
+
+            thisCart.dom.form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                thisCart.sendOrder();
+            });
         }
 
         update() {
             const thisCart = this;
-            const deliveryFee = settings.cart.defaultDeliveryFee;
+            let deliveryFee = settings.cart.defaultDeliveryFee;
 
 
             let totalNumber = 0;
@@ -391,6 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (totalNumber === 0) {
                 thisCart.totalPrice = 0;
+                deliveryFee = 0;
             } else {
                 thisCart.totalPrice = subtotalPrice + deliveryFee;
                 console.log(thisCart.totalPrice);
@@ -399,7 +413,6 @@ document.addEventListener('DOMContentLoaded', function () {
             thisCart.dom.totalNumber.textContent = totalNumber;
             thisCart.dom.subtotalPrice.textContent = subtotalPrice;
             thisCart.dom.deliveryFee.textContent = deliveryFee;
-            //thisCart.dom.totalPrice.textContent = thisCart.totalPrice;
 
             for (let totalPrice of thisCart.dom.totalPrice) {
                 totalPrice.textContent = thisCart.totalPrice;
@@ -434,6 +447,45 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        sendOrder() {
+            const thisCart = this;
+
+            const url = settings.db.url + '/' + settings.db.orders;
+
+            const payload = {
+                address: thisCart.dom.address.value,
+                phone: thisCart.dom.phone.value,
+                totalPrice: thisCart.totalPrice,
+                subtotalPrice: thisCart.totalPrice - thisCart.deliveryFee,
+                totalNumber: thisCart.totalNumber,
+                deliveryFee: thisCart.deliveryFee,
+                products: [],
+            };
+
+            for (let cartProduct of thisCart.products) {
+                payload.products.push(cartProduct.getData());
+            }
+
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            };
+            
+            fetch(url, options)
+                .then(function (rawResponse) {
+                    return rawResponse.json();
+                })
+                .then(function (parsedResponse) {
+                    console.log('Order sent:', parsedResponse);
+                    window.alert('Twoje zamówienie zostało wysłane do realizacji.');
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+                });
+        }
     }
 
     class CartProduct {
@@ -503,7 +555,23 @@ document.addEventListener('DOMContentLoaded', function () {
             thisCartProduct.dom.remove.addEventListener('click', function (event) {
                 event.preventDefault();
                 thisCartProduct.remove();
-            })
+            });
+        }
+
+        getData() {
+            const thisCartProduct = this;
+
+
+            const productData = {
+                id: thisCartProduct.id,
+                amount: thisCartProduct.amount,
+                price: thisCartProduct.price,
+                priceSingle: thisCartProduct.priceSingle,
+                name: thisCartProduct.name,
+                params: thisCartProduct.params,
+            };
+
+            return productData;
         }
     }
 
@@ -512,14 +580,26 @@ document.addEventListener('DOMContentLoaded', function () {
             const thisApp = this;
 
             for (let productData in thisApp.data.products) {
-                new Product(productData, thisApp.data.products[productData]);
+                new Product(thisApp.data.products[productData].id, thisApp.data.products[productData]);
             }
         },
 
         initData: function () {
             const thisApp = this;
+            thisApp.data = {};
+            const url = settings.db.url + '/' + settings.db.products;
 
-            thisApp.data = dataSource;
+            fetch(url)
+                .then(function (rawResponse) {
+                    return rawResponse.json();
+                })
+                .then(function (parsedResponse) {
+                    thisApp.data.products = parsedResponse;
+                    thisApp.initMenu();
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+                });
         },
         initCart: function () {
             const thisApp = this;
@@ -532,7 +612,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const thisApp = this;
 
             thisApp.initData();
-            thisApp.initMenu();
             thisApp.initCart();
         },
 
