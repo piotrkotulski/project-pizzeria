@@ -405,27 +405,18 @@ document.addEventListener('DOMContentLoaded', function () {
         add(menuProduct) {
             const thisCart = this;
 
-            thisCart.renderCartProduct(menuProduct);
+            const generatedHTML = templates.cartProduct(menuProduct);
 
-            const cartProductInstance = new CartProduct(menuProduct, thisCart.dom.productList);
+            const generatedDOM = utils.createDOMFromHTML(generatedHTML);
+
+            thisCart.dom.productList.appendChild(generatedDOM);
+
+            const cartProductInstance = new CartProduct(menuProduct, generatedDOM);
 
             thisCart.products.push(cartProductInstance);
             cartProductInstance.initAmountWidget();
             thisCart.update();
         }
-
-
-        renderCartProduct(productData) {
-            const thisCart = this;
-
-            const generatedHTML = templates.cartProduct(productData);
-
-            const generatedDOM = utils.createDOMFromHTML(generatedHTML);
-
-            thisCart.dom.productList.appendChild(generatedDOM); // Dodane
-
-        }
-
     }
 
     class CartProduct {
@@ -440,6 +431,7 @@ document.addEventListener('DOMContentLoaded', function () {
             thisCartProduct.getElements(element);
             thisCartProduct.initAmountWidget();
             thisCartProduct.processOrder();
+            thisCartProduct.initActions();
         }
 
         getElements(element) {
@@ -469,6 +461,32 @@ document.addEventListener('DOMContentLoaded', function () {
             thisCartProduct.price = thisCartProduct.priceSingle * thisCartProduct.amount;
 
             thisCartProduct.dom.price.innerHTML = thisCartProduct.price;
+        }
+
+        remove() {
+            const thisCartProduct = this;
+
+            const event = new CustomEvent('remove', {
+                bubbles: true,
+                detail: {
+                    cartProduct: thisCartProduct,
+                },
+            });
+
+            thisCartProduct.dom.wrapper.dispatchEvent(event);
+            console.log('click remove');
+        }
+
+        initActions() {
+            const thisCartProduct = this;
+
+            thisCartProduct.dom.edit.addEventListener('click', function (event) {
+                event.preventDefault();
+            });
+            thisCartProduct.dom.remove.addEventListener('click', function (event) {
+                event.preventDefault();
+                thisCartProduct.remove();
+            })
         }
     }
 
