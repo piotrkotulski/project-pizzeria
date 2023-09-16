@@ -368,6 +368,11 @@ document.addEventListener('DOMContentLoaded', function () {
             thisCart.dom.productList.addEventListener('updated', function () {
                 thisCart.update();
             });
+
+            thisCart.dom.productList.addEventListener('remove', function (event) {
+                const cartProduct = event.detail.cartProduct;
+                thisCart.remove(cartProduct);
+            });
         }
 
         update() {
@@ -417,6 +422,18 @@ document.addEventListener('DOMContentLoaded', function () {
             cartProductInstance.initAmountWidget();
             thisCart.update();
         }
+
+        remove(cartProduct) {
+            const thisCart = this;
+            const productIndex = thisCart.products.indexOf(cartProduct);
+
+            if (productIndex !== -1) {
+                cartProduct.dom.wrapper.remove();
+                thisCart.products.splice(productIndex, 1);
+                thisCart.update();
+            }
+        }
+
     }
 
     class CartProduct {
