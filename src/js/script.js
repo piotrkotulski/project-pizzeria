@@ -455,16 +455,16 @@ document.addEventListener('DOMContentLoaded', function () {
             const payload = {
                 address: thisCart.dom.address.value,
                 phone: thisCart.dom.phone.value,
-                totalPrice: thisCart.totalPrice,
-                subtotalPrice: thisCart.totalPrice - thisCart.deliveryFee,
-                totalNumber: thisCart.totalNumber,
-                deliveryFee: thisCart.deliveryFee,
+                totalPrice: parseFloat(thisCart.dom.deliveryFee.textContent) + parseFloat(thisCart.dom.subtotalPrice.textContent),
+                subtotalPrice: parseFloat(thisCart.dom.subtotalPrice.textContent),
+                totalNumber: parseInt(thisCart.dom.totalNumber.textContent),
+                deliveryFee: parseFloat(thisCart.dom.deliveryFee.textContent),
                 products: [],
             };
 
-            for (let cartProduct of thisCart.products) {
-                payload.products.push(cartProduct.getData());
-            }
+            const products = thisCart.products.map(cartProduct => cartProduct.getData());
+            
+            payload.products = products;
 
             const options = {
                 method: 'POST',
@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify(payload),
             };
-            
+
             fetch(url, options)
                 .then(function (rawResponse) {
                     return rawResponse.json();
