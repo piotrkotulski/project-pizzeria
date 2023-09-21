@@ -5,7 +5,8 @@
   },
   "extends": "eslint:recommended",
   "parserOptions": {
-    "ecmaVersion": 2015
+    "ecmaVersion": 2015,
+    "sourceType": "module"
   },
   "globals": {
     "Handlebars": false
@@ -21,7 +22,9 @@
     "quotes": [
       "error",
       "single",
-      {"allowTemplateLiterals": true}
+      {
+        "allowTemplateLiterals": true
+      }
     ],
     "semi": [
       "error",
@@ -30,6 +33,8 @@
     "no-console": [
       "off"
     ],
-    "no-prototype-builtins": ["off"]
+    "no-prototype-builtins": [
+      "off"
+    ]
   }
 }
