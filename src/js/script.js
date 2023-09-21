@@ -455,15 +455,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const payload = {
                 address: thisCart.dom.address.value,
                 phone: thisCart.dom.phone.value,
-                totalPrice: parseFloat(thisCart.dom.deliveryFee.textContent) + parseFloat(thisCart.dom.subtotalPrice.textContent),
-                subtotalPrice: parseFloat(thisCart.dom.subtotalPrice.textContent),
-                totalNumber: parseInt(thisCart.dom.totalNumber.textContent),
-                deliveryFee: parseFloat(thisCart.dom.deliveryFee.textContent),
+                totalPrice: thisCart.totalPrice,
+                subtotalPrice: thisCart.dom.subtotalPrice.textContent,
+                totalNumber: thisCart.dom.totalNumber.textContent,
+                deliveryFee: thisCart.dom.deliveryFee.textContent,
                 products: [],
             };
 
             const products = thisCart.products.map(cartProduct => cartProduct.getData());
-            
+
             payload.products = products;
 
             const options = {
