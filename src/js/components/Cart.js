@@ -1,3 +1,7 @@
+import {select, classNames, settings, templates} from '../settings.js';
+import utils from '../utils.js';
+import CartProduct from './CartProduct.js';
+
 class Cart {
     constructor(element) {
         const thisCart = this;
@@ -51,29 +55,29 @@ class Cart {
 
     update() {
         const thisCart = this;
-        let deliveryFee = settings.cart.defaultDeliveryFee;
+        thisCart.deliveryFee = settings.cart.defaultDeliveryFee;
 
 
-        let totalNumber = 0;
-        let subtotalPrice = 0;
+        thisCart.totalNumber = 0;
+        thisCart.subtotalPrice = 0;
 
 
         for (let cartProduct of thisCart.products) {
-            totalNumber += cartProduct.amountWidget.value;
-            subtotalPrice += cartProduct.priceSingle * cartProduct.amountWidget.value;
+            thisCart.totalNumber += cartProduct.amountWidget.value;
+            thisCart.subtotalPrice += cartProduct.priceSingle * cartProduct.amountWidget.value;
         }
 
-        if (totalNumber === 0) {
+        if (thisCart.totalNumber === 0) {
             thisCart.totalPrice = 0;
-            deliveryFee = 0;
+            thisCart.deliveryFee = 0;
         } else {
-            thisCart.totalPrice = subtotalPrice + deliveryFee;
+            thisCart.totalPrice = thisCart.subtotalPrice + thisCart.deliveryFee;
             console.log(thisCart.totalPrice);
         }
 
-        thisCart.dom.totalNumber.textContent = totalNumber;
-        thisCart.dom.subtotalPrice.textContent = subtotalPrice;
-        thisCart.dom.deliveryFee.textContent = deliveryFee;
+        thisCart.dom.totalNumber.textContent = thisCart.totalNumber;
+        thisCart.dom.subtotalPrice.textContent = thisCart.subtotalPrice;
+        thisCart.dom.deliveryFee.textContent = thisCart.deliveryFee;
 
         for (let totalPrice of thisCart.dom.totalPrice) {
             totalPrice.textContent = thisCart.totalPrice;
@@ -117,9 +121,9 @@ class Cart {
             address: thisCart.dom.address.value,
             phone: thisCart.dom.phone.value,
             totalPrice: thisCart.totalPrice,
-            subtotalPrice: thisCart.dom.subtotalPrice.textContent,
-            totalNumber: thisCart.dom.totalNumber.textContent,
-            deliveryFee: thisCart.dom.deliveryFee.textContent,
+            subtotalPrice: thisCart.subtotalPrice,
+            totalNumber: thisCart.totalNumber,
+            deliveryFee: thisCart.deliveryFee,
             products: [],
         };
 
@@ -148,3 +152,5 @@ class Cart {
             });
     }
 }
+
+export default Cart;
