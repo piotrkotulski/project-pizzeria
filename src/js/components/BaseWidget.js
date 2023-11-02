@@ -21,7 +21,7 @@ class BaseWidget{
 
         const newValue = this.parseValue(value);
         //const minValue = settings.amountWidget.defaultMin;
-       // const maxValue = settings.amountWidget.defaultMax;
+        // const maxValue = settings.amountWidget.defaultMax;
 
         if (newValue != thisWidget.correctValue && thisWidget.isValid(newValue)) {
 
