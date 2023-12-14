@@ -118,7 +118,7 @@ class Booking {
         const thisBooking = this;
 
         thisBooking.date = thisBooking.datePicker.value;
-        thisBooking.hour - utils.hourToNumber(thisBooking.hourPicker.value);
+        thisBooking.hour = utils.hourToNumber(thisBooking.hourPicker.value);
 
         let allAvailable = false;
 
@@ -169,10 +169,10 @@ class Booking {
     initWidgets() {
         const thisBooking = this;
 
-        thisBooking.peopleAmountWidget = new AmountWidget(this.dom.peopleAmount);
-        thisBooking.hoursAmountWidget = new AmountWidget(this.dom.hoursAmount);
-        this.datePicker = new DatePicker(thisBooking.dom.datePicker);
-        this.hourPicker = new HourPicker(thisBooking.dom.hourPicker);
+        thisBooking.peopleAmountWidget = new AmountWidget(thisBooking.dom.peopleAmount);
+        thisBooking.hoursAmountWidget = new AmountWidget(thisBooking.dom.hoursAmount);
+        thisBooking.datePicker = new DatePicker(thisBooking.dom.datePicker);
+        thisBooking.hourPicker = new HourPicker(thisBooking.dom.hourPicker);
 
         thisBooking.dom.wrapper.addEventListener('updated', function () {
             thisBooking.updateDOM();
